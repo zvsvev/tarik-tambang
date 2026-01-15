@@ -43,9 +43,9 @@ Contract Manager bertindak sebagai "Pusat Kendali" bagi bot. Alur kerjanya adala
 - Node.js v18.x (LTS) atau versi yang lebih tinggi.
 - Smart Contract Access: Akun dengan saldo ETH yang memadai di jaringan Base Sepolia untuk manajemen gas fees dan akumulasi taruhan.
 - Process Manager: Disarankan menggunakan PM2 (Process Manager 2) untuk memastikan persistensi proses, monitoring logs, dan pemulihan otomatis (auto-restart).
-**Infrastruktur Deployment (Pilihan):**
-Remote Server (Recommended): Virtual Private Server (VPS) berbasis Linux untuk menjamin stabilitas dan uptime sistem 24/7. Dalam proyek ini, saya menggunakan droplet DigitalOcean dengan spesifikasi Ubuntu 24.04 (LTS) x64, 1 GB Memory / 25 GB Disk.
-Local Machine: Perangkat lokal (macOS/Linux/Windows) 
+- **Infrastruktur Deployment (Pilihan):**
+    - Remote Server (Recommended): Virtual Private Server (VPS) berbasis Linux untuk menjamin stabilitas dan uptime sistem 24/7. Dalam proyek ini, saya menggunakan droplet DigitalOcean dengan spesifikasi Ubuntu 24.04 (LTS) x64, 1 GB Memory / 25 GB Disk.
+    - Local Machine: Perangkat lokal (macOS/Linux/Windows) 
 
 ### 2. Instalasi
 ```bash
