@@ -46,6 +46,10 @@ Jika salah satu tim menang, total pot (gabungan dana Team A + Team B) akan dibag
 Jika terjadi seri, sistem **tidak memungut fee apapun**.
 - **100% Refund**: Semua user dari Team A dan Team B dapat mengklaim kembali dana mereka secara utuh (100%) tanpa potongan biaya admin atau finalizer. Ini memberikan rasa aman bagi pemain saat kompetisi berjalan seimbang.
 
+### 🤖 Automated Liquidity Bot
+Proyek ini dilengkapi dengan bot otomatis untuk menjaga likuiditas permainan, mencegah sesi kosong, dan memastikan transisi antar sesi yang lancar.
+- **Selengkapnya**: [Dokumentasi Auto-Bet Bot](BOT_README.md)
+
 ---
 
 ## 🛠 Panduan Instalasi & Testing

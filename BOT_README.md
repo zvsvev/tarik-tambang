@@ -2,7 +2,18 @@
 
 **"Automated On-chain Strategy Manager"**
 
-Bot ini adalah script off-chain berbasis Node.js yang bertugas menjaga aktivitas permainan agar tetap hidup dengan melakukan taruhan secara otomatis mengacu pada aturan yang ditetapkan di Blockchain.
+Bot ini adalah script off-chain berbasis Node.js yang berfungsi sebagai **Liquidity Provider** otomatis. Bot ini sangat krusial untuk memastikan ekosistem TarikTambang tetap hidup dengan melakukan transaksi taruhan secara otomatis berdasarkan aturan yang ditetapkan di Blockchain.
+
+---
+
+## ❓ Mengapa Menggunakan Bot Ini?
+
+Dalam sistem permainan berbasis waktu (Hourly Sessions) seperti TarikTambang Onchain, ada risiko terjadinya **"Empty Sessions"**. Berikut adalah alasan utama mengapa bot ini diimplementasikan:
+
+1.  **Mencegah Sesi Kosong**: Untuk menjamin game selalu berjalan di setiap jam, bot bertindak sebagai partisipan aktif yang memastikan selalu ada taruhan (minimal) di kedua tim, sehingga pemain asli selalu memiliki kompetisi.
+2.  **Menjamin Kelangsungan Sesi (Lazy Trigger)**: Karena sistem kita menggunakan *Lazy Session Creation*, sesi baru hanya akan terbuat jika ada taruhan masuk. Bot memastikan transisi antar sesi terjadi tepat waktu tanpa menunggu pemain manual.
+3.  **Memancing Aktivitas User**: Secara psikologis, user lebih tertarik bertaruh jika sudah ada volume dana di dalam pot. Bot berfungsi untuk "memicu" ketertarikan pemain asli dengan mengisi awal modal di setiap sesi.
+4.  **Stabilitas Sistem**: Bot menjaga konsistensi data on-chain agar statistik permainan tetap stabil dan dapat dianalisis secara berkelanjutan.
 
 ---
 
