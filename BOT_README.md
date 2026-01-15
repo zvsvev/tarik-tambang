@@ -8,7 +8,7 @@ Bot ini adalah script off-chain berbasis Node.js yang bertugas menjaga aktivitas
 
 ## 📍 AutoBetManager Details
 
-- **Manager Contract Address**: [`0x07b8e3c89bd7d27b6df5dc06919282e786c2e466`](https://sepolia.basescan.org/address/0x07b8e3c89bd7d27b6df5dc06919282e786c2e466)
+- **Manager Contract Address**: <a href="https://sepolia.basescan.org/address/0x07b8e3c89bd7d27b6df5dc06919282e786c2e466" target="_blank">0x07b8e3c89bd7d27b6df5dc06919282e786c2e466</a>
 - **Fungsi Utama**: Menyimpan konfigurasi strategi bot secara on-chain agar transparan dan dapat dikendalikan jarak jauh.
 
 ---

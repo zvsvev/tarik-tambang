@@ -8,9 +8,9 @@ TarikTambang Onchain adalah smart contract betting game berbasis waktu yang berj
 
 ## 📍 Contract Details
 
-- **Smart Contract Address**: [`0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd`](https://sepolia.basescan.org/address/0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd)
+- **Smart Contract Address**: <a href="https://sepolia.basescan.org/address/0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd" target="_blank">0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd</a>
 - **Network**: Base Sepolia (Testnet)
-- **Block Explorer**: [BaseScan Sepolia](https://sepolia.basescan.org/address/0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd#code)
+- **Block Explorer**: <a href="https://sepolia.basescan.org/address/0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd#code" target="_blank">BaseScan Sepolia</a>
 
 ---
 
