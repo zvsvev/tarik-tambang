@@ -2,11 +2,11 @@
 
 **"Pull Together, Win Together"**
 
-TarikTambang Onchain adalah smart contract betting game berbasis waktu yang berjalan di jaringan Base. Game ini mensimulasikan kompetisi "Tarik Tambang" secara on-chain di mana pemenang ditentukan bukan oleh keberuntungan (random), melainkan oleh kekuatan modal tim (fund-based).
+TarikTambang Onchain adalah smart contract betting game revolusioner di jaringan Base yang menggabungkan transparansi blockchain dengan mekanik kompetisi tim. Berbeda dengan platform judi tradisional yang mengandalkan algoritma random (RNG), game ini sepenuhnya ditentukan oleh **kekuatan modal kolektif** para pemainnya.
 
 ---
 
-## 📍 Contract Details
+## 📍 Infromasi Contract
 
 - **Smart Contract Address**: <a href="https://sepolia.basescan.org/address/0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd" target="_blank">0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd</a>
 - **Network**: Base Sepolia (Testnet)
@@ -14,74 +14,79 @@ TarikTambang Onchain adalah smart contract betting game berbasis waktu yang berj
 
 ---
 
-## 🚀 Alur Kerja TarikTambangOnchain
+## 🛠 Penjelasan Teknis & Alur Kerja
 
-Game ini dirancang dengan mekanisme **Hourly Aligned Sessions** dan **Lazy Execution**.
+Smart contract ini (`TarikTambangOnchain.sol`) dirancang untuk efisiensi gas dan keteraturan waktu. Berikut adalah bedah tuntas alur kerjanya:
 
-1.  **Sesi Terpusat pada Jam**: Setiap sesi berlangsung tepat selama 1 jam dan sejajar dengan waktu dunia (misal: 09:00 - 10:00, 10:00 - 11:00).
-2.  **Lazy Session Creation**: Sesi baru tidak dibuat oleh timer otomatis (untuk menghemat gas). Sesi baru akan otomatis terbuat ketika ada user pertama yang memasang bet setelah sesi sebelumnya berakhir.
-3.  **Auto-Finalization**: Saat sesi baru dibuat, sistem akan otomatis melakukan "Finalisasi" pada sesi sebelumnya untuk menentukan pemenang.
-4.  **Penentuan Pemenang (Fund-Based)**:
-    - **Team A Menang**: Jika Total Dana Team A > Total Dana Team B.
-    - **Team B Menang**: Jika Total Dana Team B > Total Dana Team A.
-    - **Draw (Seri)**: Jika Total Dana Team A == Total Dana Team B.
-5.  **Mekanisme Claim & Refund**: User harus memanggil fungsi `claim` secara manual untuk mengambil haknya setelah sesi difinalisasi.
+### 1. Mekanisme Penyelarasan Waktu (Hourly Alignment)
+Sistem tidak menggunakan interval waktu acak, melainkan menyinkronkan setiap sesi dengan jam dunia (jam dinding).
+- **Logika Kode**: Menggunakan formula `(block.timestamp / 1 hours) * 1 hours`.
+- **Hasil**: Jika seorang user memasang bet pada pukul 14:25, sistem akan secara matematis menarik garis awal sesi pada 14:00 dan berakhir pada 15:00. Ini memastikan jadwal game sangat terprediksi.
+
+### 2. Pola Eksekusi "Lazy" (Lazy Execution)
+Untuk menghemat biaya operasional, smart contract tidak melakukan finalisasi sesi sendiri (karena smart contract tidak bisa berjalan sendiri tanpa dipicu).
+- **Alur**: Ketika user pertama memasang bet di jam baru, fungsi `_ensureCurrentSession()` akan dipanggil.
+- **Tugas**: Fungsi ini secara otomatis memeriksa apakah sesi sebelumnya sudah berakhir. Jika ya, ia akan menjalankan fungsi `_finalizeSession()` untuk sesi lama dan sekaligus membuka `_createSession()` untuk jam yang baru.
+
+### 3. Logika Penentuan Pemenang (Fund-Based)
+Inilah inti dari TarikTambang. Pemenang ditentukan murni dari perbandingan total dana di kedua tim:
+- **Winning Condition**: `totalTeamA > totalTeamB` maka Team A Menang.
+- **Draw Condition**: `totalTeamA == totalTeamB` maka status menjadi Draw.
+Sistem ini menghilangkan resiko manipulasi angka acak.
+
+### 4. Matematika Pembagian Hadiah (Proportional Reward)
+Pembagian hadiah dilakukan dengan prinsip keadilan proporsional terhadap kontribusi masing-masing user.
+
+#### Skenario Ada Pemenang:
+Total Pot dipotong biaya operasional terlebih dahulu:
+- **Pemenang Pot**: 97% dari total pot.
+- **House Fee**: 2.5% (untuk biaya maintenance/admin).
+- **Finalizer Reward**: 0.5% (insentif bagi siapapun—user atau bot—yang memicu penutupan sesi).
+
+**Rumus:** `reward = (Bet_User * Winner_Pot) / Total_Dana_Tim_Pemenang`
+
+#### Skenario Draw (Seri):
+Sebagai bentuk perlindungan terhadap user, saat terjadi seri:
+- **No Fees**: Tidak ada biaya admin atau finalizer yang diambil.
+- **100% Refund**: Semua dana dikembalikan utuh ke seluruh pengirim.
 
 ---
 
-## 🧠 Pendekatan Solusi & Pembagian Hadiah
+## 🤖 Bot Likuiditas & Pencegahan Sesi Kosong
+Kami menggunakan bot otomatis untuk menjaga game tetap hidup 24/7. Bot ini berfungsi untuk:
+1. **Memicu Transisi**: Memastikan sesi baru selalu terbuat tepat di awal jam.
+2. **Menyediakan Likuiditas**: Mencegah sesi kosong agar pemain asli selalu memiliki lawan untuk bertanding.
+3. **Pusat Kendali**: Menggunakan `AutoBetManager.sol` agar strategi bot bisa dipantau dan diatur secara on-chain.
 
-Kami memilih pendekatan **"Transparent Shared Pot"** untuk memastikan keadilan bagi seluruh pemain.
-
-### Pembagian Hadiah (Jika Ada Pemenang)
-Jika salah satu tim menang, total pot (gabungan dana Team A + Team B) akan dibagikan dengan aturan:
-- **97% untuk Pemenang**: Dibagikan secara proporsional kepada semua user di tim pemenang.
-- **2.5% House Fee**: Dikumpulkan untuk pemilik contract (Admin).
-- **0.5% Finalizer Reward**: Diberikan kepada orang/bot yang memicu finalisasi sesi.
-
-**Rumus Proposional:**
-`Hadiah User = (Bet User / Total Taruhan Tim Pemenang) * (Total Pot * 97%)`
-
-### Penanganan Kondisi Seri (Draw)
-Jika terjadi seri, sistem **tidak memungut fee apapun**.
-- **100% Refund**: Semua user dari Team A dan Team B dapat mengklaim kembali dana mereka secara utuh (100%) tanpa potongan biaya admin atau finalizer. Ini memberikan rasa aman bagi pemain saat kompetisi berjalan seimbang.
-
-### 🤖 Automated Liquidity Bot
-Proyek ini dilengkapi dengan bot otomatis untuk menjaga likuiditas permainan, mencegah sesi kosong, dan memastikan transisi antar sesi yang lancar.
-- **Selengkapnya**: [Dokumentasi Auto-Bet Bot](BOT_README.md)
+- **Detail Bot**: [Baca Dokumentasi Strategi Bot (BOT_README.md)](BOT_README.md)
 
 ---
 
-## 🛠 Panduan Instalasi & Testing
+## 💻 Panduan Instalasi & Pengembangan
 
-Pastikan Anda sudah menginstall [Foundry](https://book.getfoundry.sh/getting-started/installation).
+### Prasyarat
+- Foundry / Forge
+- Base Sepolia RPC
 
-### 1. Clone & Install
+### Kompilasi & Test
 ```bash
-git clone https://github.com/zvsvev/tarik-tambang.git
-cd tarik-tambang
-forge install
-```
-
-### 2. Compile
-```bash
+# Compile contracts
 forge build
+
+# Run tests
+forge test -vv
 ```
 
-### 3. Testing
-Untuk menjalankan test suite dan memverifikasi logika pembagian hadiah:
+### Deployment (Script)
 ```bash
-forge test -vvv
-```
-
-### 4. Deployment Manual
-```bash
-forge create src/TarikTambangOnchain.sol:TarikTambangOnchain \
-    --rpc-url <YOUR_RPC_URL> \
-    --private-key <YOUR_PRIVATE_KEY>
+forge script script/DeployTarikTambang.s.sol:DeployTarikTambang --rpc-url <RPC_URL> --broadcast --verify
 ```
 
 ---
 
-## 📄 Lisensi
-Distributed under the MIT License. See `LICENSE` for more information.
+## 📄 Karakteristik Utama Solusi
+- **Permissionless**: Siapapun bisa memicu finalisasi dan mendapatkan reward 0.5%.
+- **Secure**: Menggunakan `ReentrancyGuard` untuk mencegah serangan double-withdraw.
+- **Transparent**: Semua perhitungan hadiah dilakukan secara terbuka di atas blockchain (Open Source).
+
+Developed for **UGM Blockchain Club Assignment**. 🚀🎯
