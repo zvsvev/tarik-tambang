@@ -72,7 +72,7 @@ async function getBotConfig(walletAddress) {
     return {
         minBet: ethers.parseEther('0.0001'),
         maxBet: ethers.parseEther('0.0002'),
-        frequency: 600, // 10 minutes
+        frequency: 3600, // 60 minutes
         isActive: true,
         teamAWeight: 50,
     };
@@ -157,22 +157,33 @@ async function runBot() {
 
     const now = Date.now();
     // Use first wallet's frequency as master frequency (or you can customize)
-    const config = await getBotConfig(new ethers.Wallet(BOT_PRIVATE_KEYS[0], provider).address);
+    const firstWallet = new ethers.Wallet(BOT_PRIVATE_KEYS[0], provider);
+    const config = await getBotConfig(firstWallet.address);
 
     if (now - lastRunTime >= config.frequency * 1000) {
         isExecuting = true;
-        console.log(`⏰ [${new Date().toLocaleString()}] Starting Multi-Wallet Cycle...`);
+        lastRunTime = now;
+        console.log(`⏰ [${new Date().toLocaleString()}] Starting Staggered Multi-Wallet Cycle...`);
+        console.log(`⏳ Spreading ${BOT_PRIVATE_KEYS.length} wallets across a 10-minute window.`);
 
-        try {
-            for (const key of BOT_PRIVATE_KEYS) {
+        const STAGGER_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+        let completedWallets = 0;
+
+        for (const key of BOT_PRIVATE_KEYS) {
+            const randomDelay = Math.floor(Math.random() * STAGGER_WINDOW_MS);
+            const walletAddress = new ethers.Wallet(key).address;
+
+            console.log(`📅 [${walletAddress.substring(0, 6)}] Scheduled in ${(randomDelay / 60000).toFixed(2)} mins`);
+
+            setTimeout(async () => {
                 await placeBetForWallet(key);
-                // Slight delay between wallets to avoid nonce issues if using same wallet (not the case here but good practice)
-                await new Promise(resolve => setTimeout(resolve, 2000));
-            }
-            lastRunTime = now;
-        } finally {
-            isExecuting = false;
-            console.log('--- Cycle Finished ---');
+                completedWallets++;
+
+                if (completedWallets === BOT_PRIVATE_KEYS.length) {
+                    isExecuting = false;
+                    console.log('--- Staggered Cycle Finished ---');
+                }
+            }, randomDelay);
         }
     }
 }
