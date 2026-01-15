@@ -14,6 +14,7 @@ const GAME_ABI = [
     'function betOnTeamB() external payable',
     'function currentSessionId() external view returns (uint256)',
     'function isBettingOpen() external view returns (bool)',
+    'function getUserBet(uint256 sessionId, address user) external view returns (uint8 team, uint256 amount)',
 ];
 
 // Manager Contract ABI (minimal)
@@ -38,6 +39,9 @@ const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new ethers.Wallet(BOT_PRIVATE_KEY, provider);
 const gameContract = new ethers.Contract(GAME_CONTRACT_ADDRESS, GAME_ABI, wallet);
 const managerContract = MANAGER_CONTRACT_ADDRESS ? new ethers.Contract(MANAGER_CONTRACT_ADDRESS, MANAGER_ABI, wallet) : null;
+
+let lastRunTime = 0;
+let isExecuting = false;
 
 console.log('🤖 TarikTambang Auto-Bet Bot (Enhanced) Started');
 console.log('📍 Game Contract:', GAME_CONTRACT_ADDRESS);
@@ -104,9 +108,22 @@ async function placeBet() {
 
         const sessionId = await gameContract.currentSessionId();
 
-        // Random team based on weight
-        const randomVal = Math.random() * 100;
-        const team = randomVal < config.teamAWeight ? 'TeamA' : 'TeamB';
+        // Check if bot already committed to a team in this session
+        const [currentTeamInt] = await gameContract.getUserBet(sessionId, wallet.address);
+        let team;
+
+        if (currentTeamInt === 1) { // 1 = TeamA
+            team = 'TeamA';
+            console.log(`ℹ️ Bot already bet on TeamA this session. Continuing...`);
+        } else if (currentTeamInt === 2) { // 2 = TeamB
+            team = 'TeamB';
+            console.log(`ℹ️ Bot already bet on TeamB this session. Continuing...`);
+        } else {
+            // First bet of the session: pick random team based on weight
+            const randomVal = Math.random() * 100;
+            team = randomVal < config.teamAWeight ? 'TeamA' : 'TeamB';
+            console.log(`🎲 First bet of session: Picking ${team} (Weight: ${config.teamAWeight}%)`);
+        }
 
         // Random amount between min and max
         const minEth = parseFloat(ethers.formatEther(config.minBet));
@@ -153,15 +170,25 @@ async function checkBalance() {
  * Main loop logic
  */
 async function runBot() {
+    if (isExecuting) {
+        console.log('⏳ Bot is already executing a transaction, skipping this cycle...');
+        return;
+    }
+
     const now = Date.now();
     const config = await getBotConfig();
 
     // Check if enough time has passed based on frequency
     if (now - lastRunTime >= config.frequency * 1000) {
-        console.log(`⏰ [${new Date().toLocaleString()}] Cycle Start`);
-        await checkBalance();
-        await placeBet();
-        lastRunTime = now;
+        isExecuting = true;
+        try {
+            console.log(`⏰ [${new Date().toLocaleString()}] Cycle Start`);
+            await checkBalance();
+            await placeBet();
+            lastRunTime = now;
+        } finally {
+            isExecuting = false;
+        }
     }
 }
 
