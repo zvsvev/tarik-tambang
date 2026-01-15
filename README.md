@@ -47,8 +47,17 @@ Total Pot dipotong biaya operasional terlebih dahulu:
 
 #### Skenario Draw (Seri):
 Sebagai bentuk perlindungan terhadap user, saat terjadi seri:
-- **No Fees**: Tidak ada biaya admin atau finalizer yang diambil.
+- **No Fees**: Tidak ada biaya admin (House) atau finalizer yang diambil dari dana user.
 - **100% Refund**: Semua dana dikembalikan utuh ke seluruh pengirim.
+- **Mekanisme "Pull-Based" Claim**: Refund dilakukan melalui fungsi klaim mandiri oleh user, **BUKAN melalui Airdrop otomatis**. 
+
+**Mengapa menggunakan sistem Claim (Pull) bukannya Airdrop (Push)?**
+Dalam pengembangan blockchain profesional, kami memilih pola *Pull-over-Push* karena beberapa alasan krusial:
+1.  **Gas Efficiency**: Melakukan airdrop otomatis ke ratusan atau ribuan user dalam satu transaksi finalisasi akan memakan biaya gas yang sangat besar dan berisiko gagal karena melebihi *Block Gas Limit*.
+2.  **Security (DOS Protection)**: Sistem airdrop otomatis rentan terhadap serangan DOS. Jika salah satu alamat penerima adalah smart contract jahat yang menolak transfer (`revert`), maka seluruh proses refund untuk semua user lain akan ikut terkunci dan gagal.
+3.  **Cost Fairness**: User hanya membayar gas untuk transaksi mereka sendiri saat melakukan klaim, memastikan beban biaya operasional terdistribusi secara adil.
+
+User dapat memanggil fungsi `claim(sessionId)` kapan saja setelah sesi statusnya `finalized` dan `winner` adalah `None`.
 
 ---
 
