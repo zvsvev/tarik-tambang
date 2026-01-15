@@ -52,7 +52,7 @@ Sebagai bentuk perlindungan terhadap user, saat terjadi seri:
 - **Mekanisme "Pull-Based" Claim**: Refund dilakukan melalui fungsi klaim mandiri oleh user, **BUKAN melalui Airdrop otomatis**. 
 
 **Mengapa menggunakan sistem Claim (Pull) bukannya Airdrop (Push)?**
-Dalam pengembangan blockchain profesional, kami memilih pola *Pull-over-Push* karena beberapa alasan krusial:
+Dalam pengembangan blockchain profesional, saya memilih pola *Pull-over-Push* karena beberapa alasan krusial:
 1.  **Gas Efficiency**: Melakukan airdrop otomatis ke ratusan atau ribuan user dalam satu transaksi finalisasi akan memakan biaya gas yang sangat besar dan berisiko gagal karena melebihi *Block Gas Limit*.
 2.  **Security (DOS Protection)**: Sistem airdrop otomatis rentan terhadap serangan DOS. Jika salah satu alamat penerima adalah smart contract jahat yang menolak transfer (`revert`), maka seluruh proses refund untuk semua user lain akan ikut terkunci dan gagal.
 3.  **Cost Fairness**: User hanya membayar gas untuk transaksi mereka sendiri saat melakukan klaim, memastikan beban biaya operasional terdistribusi secara adil.
@@ -62,7 +62,7 @@ User dapat memanggil fungsi `claim(sessionId)` kapan saja setelah sesi statusnya
 ---
 
 ## 🤖 Bot Likuiditas & Pencegahan Sesi Kosong
-Kami menggunakan bot otomatis untuk menjaga game tetap hidup 24/7. Bot ini berfungsi untuk:
+Saya menggunakan bot otomatis untuk menjaga game tetap hidup 24/7. Bot ini berfungsi untuk:
 1. **Memicu Transisi**: Memastikan sesi baru selalu terbuat tepat di awal jam.
 2. **Menyediakan Likuiditas**: Mencegah sesi kosong agar pemain asli selalu memiliki lawan untuk bertanding.
 3. **Pusat Kendali**: Menggunakan `AutoBetManager.sol` agar strategi bot bisa dipantau dan diatur secara on-chain.
