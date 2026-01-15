@@ -165,15 +165,6 @@ contract TarikTambangOnchain {
     }
 
     /**
-     * @notice Admin manual finalization of current session
-     * @dev Only callable by owner when session has ended
-     */
-    function finalizeCurrentSession() external onlyOwner nonReentrant {
-        require(currentSessionId > 0, "No session created");
-        _finalizeSession(currentSessionId);
-    }
-
-    /**
      * @notice Owner withdraws accumulated house funds
      */
     function withdrawHouseFunds() external onlyOwner nonReentrant {
