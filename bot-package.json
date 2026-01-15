@@ -1,0 +1,18 @@
+{
+    "name": "tarik-tambang-bot",
+    "version": "1.0.0",
+    "description": "Auto-bet bot for TarikTambang V2",
+    "main": "autoBet.js",
+    "scripts": {
+        "start": "node autoBet.js",
+        "dev": "nodemon autoBet.js"
+    },
+    "dependencies": {
+        "ethers": "^6.9.0",
+        "node-cron": "^3.0.3",
+        "dotenv": "^16.3.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.2"
+    }
+}
