@@ -2,7 +2,7 @@
 
 **"Pull Together, Win Together"**
 
-TarikTambang Onchain adalah smart contract betting yang terinspirasi dari permainan tradisional tarik tambang, dideploy di jaringan Base (Sepolia Testnet) dengan menggabungkan transparansi blockchain dengan mekanik kompetisi tim. Berbeda dengan platform betting pada umumnya yang mengandalkan algoritma random (RNG), kemanangan pada game ini ditentukan oleh kekuatan modal kolektif para pemainnya.
+TarikTambang Onchain adalah smart contract betting yang terinspirasi dari permainan tradisional tarik tambang, dideploy di jaringan Base (Sepolia Testnet) dengan menggabungkan transparansi blockchain dengan mekanik kompetisi tim. Berbeda dengan platform betting pada umumnya yang mengandalkan algoritma random (RNG), kemenangan pada game ini ditentukan oleh kekuatan modal kolektif para pemainnya.
 
 ---
 
