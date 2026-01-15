@@ -80,8 +80,8 @@ pm2 startup
 ## Monitoring
 Aktivitas bot dapat dipantau secara real-time melalui:
 - **PM2 Logs**: `pm2 logs tariktambang-bot`
-- **Block Explorer**: Cek transaksi keluar pada wallet bot di BaseScan.
+- **Block Explorer**: Cek transaksi keluar pada wallet bot di <a href="https://sepolia.basescan.org/address/0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd" target="_blank">BaseScan</a>
 
 ---
 
-**Note**: Bot ini dirancang untuk tujuan edukasi dan penjagaan likuiditas game dalam ekosistem TarikTambang Onchain.
+**Note**: Bot ini dirancang untuk tujuan edukasi dan penjagaan liquidity game dalam ekosistem TarikTambang Onchain.
