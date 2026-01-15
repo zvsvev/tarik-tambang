@@ -54,10 +54,12 @@ sudo npm install -g pm2
 ```
 
 ### 3. Konfigurasi (`.env`)
-Buat file `.env` dan isi dengan alamat contract yang sudah dideploy:
+Buat file `.env` dan isi dengan detail berikut. Bot mendukung **Multi-Wallet** untuk menciptakan efek kompetisi antara Team A dan Team B secara otomatis.
+
 ```env
 RPC_URL=https://base-sepolia.drpc.org
-BOT_PRIVATE_KEY=your_private_key
+# Masukkan satu atau lebih private key dipisahkan dengan tanda koma (,)
+BOT_PRIVATE_KEY=pk_wallet_1,pk_wallet_2,pk_wallet_3
 GAME_CONTRACT_ADDRESS=0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd
 MANAGER_CONTRACT_ADDRESS=0x07b8e3c89bd7d27b6df5dc06919282e786c2e466
 ```
