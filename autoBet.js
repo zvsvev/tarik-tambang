@@ -71,7 +71,7 @@ async function getBotConfig(walletAddress) {
     // Default local settings
     return {
         minBet: ethers.parseEther('0.0001'),
-        maxBet: ethers.parseEther('0.001'),
+        maxBet: ethers.parseEther('0.0002'),
         frequency: 600, // 10 minutes
         isActive: true,
         teamAWeight: 50,
