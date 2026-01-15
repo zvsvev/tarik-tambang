@@ -1,12 +1,12 @@
-# TarikTambang Onchain 🚩
+# TarikTambang Onchain
 
 **"Pull Together, Win Together"**
 
-TarikTambang Onchain adalah smart contract betting game berbasis waktu yang berjalan di jaringan Base. Game ini mensimulasikan kompetisi "Tarik Tambang" secara on-chain di mana pemenang ditentukan bukan oleh keberuntungan (random), melainkan oleh kekuatan modal tim (fund-based).
+TarikTambang Onchain adalah smart contract betting game berbasis waktu yang berjalan di jaringan Base (Sepolia Testnet). Game ini mensimulasikan kompetisi "Tarik Tambang" secara on-chain di mana pemenang ditentukan bukan oleh keberuntungan (random), melainkan oleh kekuatan modal tim (fund-based).
 
 ---
 
-## 📍 Contract Details
+## Contract Details
 
 - **Smart Contract Address**: [`0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd`](https://sepolia.basescan.org/address/0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd)
 - **Network**: Base Sepolia (Testnet)
@@ -14,7 +14,7 @@ TarikTambang Onchain adalah smart contract betting game berbasis waktu yang berj
 
 ---
 
-## 🚀 Alur Kerja TarikTambangOnchain
+## Alur Kerja TarikTambang Onchain
 
 Game ini dirancang dengan mekanisme **Hourly Aligned Sessions** dan **Lazy Execution**.
 
@@ -29,7 +29,7 @@ Game ini dirancang dengan mekanisme **Hourly Aligned Sessions** dan **Lazy Execu
 
 ---
 
-## 🧠 Pendekatan Solusi & Pembagian Hadiah
+## Pendekatan Solusi & Pembagian Hadiah
 
 Kami memilih pendekatan **"Transparent Shared Pot"** untuk memastikan keadilan bagi seluruh pemain.
 
@@ -37,7 +37,7 @@ Kami memilih pendekatan **"Transparent Shared Pot"** untuk memastikan keadilan b
 Jika salah satu tim menang, total pot (gabungan dana Team A + Team B) akan dibagikan dengan aturan:
 - **97% untuk Pemenang**: Dibagikan secara proporsional kepada semua user di tim pemenang.
 - **2.5% House Fee**: Dikumpulkan untuk pemilik contract (Admin).
-- **0.5% Finalizer Reward**: Diberikan kepada orang/bot yang memicu finalisasi sesi.
+- **0.5% Finalizer Reward**: Diberikan kepada address yang melakukan tx finalisasi sesi.
 
 **Rumus Proposional:**
 `Hadiah User = (Bet User / Total Taruhan Tim Pemenang) * (Total Pot * 97%)`
@@ -45,37 +45,6 @@ Jika salah satu tim menang, total pot (gabungan dana Team A + Team B) akan dibag
 ### Penanganan Kondisi Seri (Draw)
 Jika terjadi seri, sistem **tidak memungut fee apapun**.
 - **100% Refund**: Semua user dari Team A dan Team B dapat mengklaim kembali dana mereka secara utuh (100%) tanpa potongan biaya admin atau finalizer. Ini memberikan rasa aman bagi pemain saat kompetisi berjalan seimbang.
-
----
-
-## 🛠 Panduan Instalasi & Testing
-
-Pastikan Anda sudah menginstall [Foundry](https://book.getfoundry.sh/getting-started/installation).
-
-### 1. Clone & Install
-```bash
-git clone https://github.com/zvsvev/tarik-tambang.git
-cd tarik-tambang
-forge install
-```
-
-### 2. Compile
-```bash
-forge build
-```
-
-### 3. Testing
-Untuk menjalankan test suite dan memverifikasi logika pembagian hadiah:
-```bash
-forge test -vvv
-```
-
-### 4. Deployment Manual
-```bash
-forge create src/TarikTambangOnchain.sol:TarikTambangOnchain \
-    --rpc-url <YOUR_RPC_URL> \
-    --private-key <YOUR_PRIVATE_KEY>
-```
 
 ---
 
