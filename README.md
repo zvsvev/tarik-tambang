@@ -11,7 +11,7 @@ TarikTambang Onchain adalah smart contract betting yang terinspirasi dari permai
 - **Smart Contract Address**: <a href="https://sepolia.basescan.org/address/0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd" target="_blank">0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd</a>
 - **Network**: Base Sepolia (Testnet)
 - **Block Explorer**: <a href="https://sepolia.basescan.org/address/0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd#code" target="_blank">BaseScan Sepolia</a>
-
+![](assets/main-1)
 ---
 
 ## Penjelasan Teknis & Alur Kerja
@@ -37,6 +37,7 @@ Ini adalah inti dari Game TarikTambang Onchain ini. Pemenang ditentukan berdasar
 Sistem distribusi hadiah dirancang menggunakan metode Pro-rata, di mana total keuntungan (Total Pot yang telah dipotong fee) dibagikan kembali kepada para pemenang secara adil berdasarkan persentase kontribusi modal mereka di dalam tim.
 
 #### Skenario Ada Pemenang:
+![](assets/main-2)
 Total Pot dipotong biaya operasional terlebih dahulu:
 - **Pemenang Pot**: 97% dari total pot.
 - **House Fee**: 2.5% (untuk biaya maintenance dan sumber revenue utama).
