@@ -37,6 +37,21 @@ Contract Manager bertindak sebagai "Pusat Kendali" bagi bot. Alur kerjanya adala
 
 ---
 
+## Mekanisme Staggered Betting (Anti-Spike)
+
+Bot ini menggunakan logika **Staggered Execution** untuk menyebar transaksi agar tidak terjadi penumpukan (spike) gas fee dan terlihat lebih organik:
+
+1.  **Cycle System**: Bot bekerja dalam siklus waktu (misal: setiap 60 menit). 
+2.  **Random Window**: Di setiap awal siklus, bot menghitung waktu acak untuk setiap wallet di dalam jendela **10 menit**.
+3.  **Spread Execution**: Transaksi tidak dikirim bersamaan, melainkan menyebar secara otomatis.
+    *   *Contoh*: 
+        *   Wallet 1: kirim tx di menit ke-2.
+        *   Wallet 2: kirim tx di menit ke-5.
+        *   Wallet 3: kirim tx di menit ke-8.
+4.  **Min Bet**: Sesuai aturan kontrak, setiap taruhan wajib minimal **0.0001 ETH**.
+
+---
+
 ## Panduan Setup Bot
 
 ### 1. Prasyarat
