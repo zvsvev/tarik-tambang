@@ -1,30 +1,29 @@
-# TarikTambang Auto-Bet Bot 🤖
+# TarikTambang Auto-Bet Bot
 
 **"Automated On-chain Strategy Manager"**
 
-Bot ini adalah script off-chain berbasis Node.js yang berfungsi sebagai **Liquidity Provider** otomatis. Bot ini sangat krusial untuk memastikan ekosistem TarikTambang tetap hidup dengan melakukan transaksi taruhan secara otomatis berdasarkan aturan yang ditetapkan di Blockchain.
+Bot ini adalah script off-chain berbasis Node.js yang berfungsi sebagai Liquidity Provider otomatis. Bot ini sangat krusial untuk memastikan ekosistem TarikTambang tetap hidup dengan melakukan transaksi taruhan secara otomatis berdasarkan aturan yang ditetapkan di Blockchain.
 
 ---
 
-## ❓ Mengapa Menggunakan Bot Ini?
+## Mengapa Menggunakan Bot Ini?
 
-Dalam sistem permainan berbasis waktu (Hourly Sessions) seperti TarikTambang Onchain, ada risiko terjadinya **"Empty Sessions"**. Berikut adalah alasan utama mengapa bot ini diimplementasikan:
+Dalam sistem permainan berbasis waktu (Hourly Sessions) seperti TarikTambang Onchain, ada risiko terjadinya "Empty Sessions". Berikut adalah alasan utama mengapa bot ini diimplementasikan:
 
 1.  **Mencegah Sesi Kosong**: Untuk menjamin game selalu berjalan di setiap jam, bot bertindak sebagai partisipan aktif yang memastikan selalu ada taruhan (minimal) di kedua tim, sehingga pemain asli selalu memiliki kompetisi.
-2.  **Menjamin Kelangsungan Sesi (Lazy Trigger)**: Karena sistem kita menggunakan *Lazy Session Creation*, sesi baru hanya akan terbuat jika ada taruhan masuk. Bot memastikan transisi antar sesi terjadi tepat waktu tanpa menunggu pemain manual.
-3.  **Memancing Aktivitas User**: Secara psikologis, user lebih tertarik bertaruh jika sudah ada volume dana di dalam pot. Bot berfungsi untuk "memicu" ketertarikan pemain asli dengan mengisi awal modal di setiap sesi.
-4.  **Stabilitas Sistem**: Bot menjaga konsistensi data on-chain agar statistik permainan tetap stabil dan dapat dianalisis secara berkelanjutan.
+2.  **Menjamin Kelangsungan Sesi (Lazy Trigger)**: Karena sistem dari TarikTambang Onchain ini menggunakan *Lazy Session Creation*, sesi baru hanya akan terbuat jika ada taruhan masuk. Bot memastikan transisi antar sesi terjadi tepat waktu tanpa menunggu pemain manual.
+3.  **Memancing Aktivitas User**: Secara psikologis, user lebih tertarik bermain jika sudah ada volume dana di dalam pot. Bot berfungsi untuk memunculkan ketertarikan pemain asli dengan mengisi awal modal di setiap sesi.
 
 ---
 
-## 📍 AutoBetManager Details
+## AutoBetManager Details
 
 - **Manager Contract Address**: <a href="https://sepolia.basescan.org/address/0x07b8e3c89bd7d27b6df5dc06919282e786c2e466" target="_blank">0x07b8e3c89bd7d27b6df5dc06919282e786c2e466</a>
 - **Fungsi Utama**: Menyimpan konfigurasi strategi bot secara on-chain agar transparan dan dapat dikendalikan jarak jauh.
 
 ---
 
-## 🚀 Alur Kerja AutoBetManager.sol
+## Alur Kerja AutoBetManager.sol
 
 Contract Manager bertindak sebagai "Pusat Kendali" bagi bot. Alur kerjanya adalah sebagai berikut:
 
@@ -32,17 +31,21 @@ Contract Manager bertindak sebagai "Pusat Kendali" bagi bot. Alur kerjanya adala
     - `min/maxBet`: Batas nominal taruhan.
     - `frequency`: Jeda waktu antar taruhan (dalam detik).
     - `teamAWeight`: Preferensi tim (misal 70% arah Team A).
-2.  **Health Check**: Bot di VPS akan melakukan request ke Manager setiap kali akan beraksi untuk mengecek fungsi `isBotActive`. Jika admin mematikan bot via blockchain, bot di VPS akan otomatis berhenti (pause).
+2.  **Health Check**: Bot akan melakukan request ke Manager setiap kali akan beraksi untuk mengecek fungsi `isBotActive`. Jika admin mematikan bot via blockchain, bot akan otomatis berhenti (pause).
 3.  **Dynamic Updates**: Jika admin merubah frekuensi taruhan di Blockchain, bot akan langsung menyesuaikan perilakunya tanpa perlu restart script di server.
 4.  **Multi-Bot Support**: Contract dirancang untuk bisa menangani banyak operator bot sekaligus dengan konfigurasi yang unik untuk masing-masing wallet.
 
 ---
 
-## 🛠 Panduan Setup Bot di VPS
+## Panduan Setup Bot
 
 ### 1. Prasyarat
-- Node.js v18+
-- Akun Base Sepolia dengan saldo ETH.
+- Node.js v18.x (LTS) atau versi yang lebih tinggi.
+- Smart Contract Access: Akun dengan saldo ETH yang memadai di jaringan Base Sepolia untuk manajemen gas fees dan akumulasi taruhan.
+- Process Manager: Disarankan menggunakan PM2 (Process Manager 2) untuk memastikan persistensi proses, monitoring logs, dan pemulihan otomatis (auto-restart).
+**Infrastruktur Deployment (Pilihan):**
+Remote Server (Recommended): Virtual Private Server (VPS) berbasis Linux untuk menjamin stabilitas dan uptime sistem 24/7. Dalam proyek ini, saya menggunakan droplet DigitalOcean dengan spesifikasi Ubuntu 24.04 (LTS) x64, 1 GB Memory / 25 GB Disk.
+Local Machine: Perangkat lokal (macOS/Linux/Windows) 
 
 ### 2. Instalasi
 ```bash
@@ -74,10 +77,10 @@ pm2 startup
 
 ---
 
-## 📊 Monitoring
-Anda dapat memantau aktivitas bot secara real-time melalui:
+## Monitoring
+Aktivitas bot dapat dipantau secara real-time melalui:
 - **PM2 Logs**: `pm2 logs tariktambang-bot`
-- **Block Explorer**: Cek transaksi keluar pada wallet bot Anda di BaseScan.
+- **Block Explorer**: Cek transaksi keluar pada wallet bot di BaseScan.
 
 ---
 
