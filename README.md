@@ -2,7 +2,7 @@
 
 **"Pull Together, Win Together"**
 
-TarikTambang Onchain adalah smart contract betting yang terinspirasi dari permainan tradisional tarik tambang, dideploy di jaringan Base (Sepolia Testnet) dengan menggabungkan transparansi blockchain dengan mekanik kompetisi tim. Berbeda dengan platform betting pada umumnya yang mengandalkan algoritma random (RNG), game ini sepenuhnya ditentukan oleh kekuatan modal kolektif para pemainnya.
+TarikTambang Onchain adalah smart contract betting yang terinspirasi dari permainan tradisional tarik tambang, dideploy di jaringan Base (Sepolia Testnet) dengan menggabungkan transparansi blockchain dengan mekanik kompetisi tim. Berbeda dengan platform betting pada umumnya yang mengandalkan algoritma random (RNG), kemanangan pada game ini ditentukan oleh kekuatan modal kolektif para pemainnya.
 
 ---
 
@@ -75,4 +75,4 @@ Saya menggunakan bot otomatis untuk menjaga game tetap hidup 24/7. Bot ini berfu
 ## Karakteristik Utama Solusi
 - **Permissionless**: Siapapun bisa memicu finalisasi dan mendapatkan reward 0.5%.
 - **Secure**: Menggunakan `ReentrancyGuard` untuk mencegah serangan double-withdraw.
-- **Transparent**: Semua perhitungan hadiah dilakukan secara terbuka di atas blockchain (Open Source).
+- **Transparent**: Semua perhitungan hadiah dilakukan secara terbuka di atas blockchain.
