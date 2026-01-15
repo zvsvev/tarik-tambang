@@ -35,13 +35,13 @@ Contract Manager bertindak sebagai "Pusat Kendali" bagi bot. Alur kerjanya adala
 3.  **Dynamic Updates**: Jika admin merubah frekuensi taruhan di Blockchain, bot akan langsung menyesuaikan perilakunya tanpa perlu restart script di server.
 4.  **Multi-Bot Support**: Contract dirancang untuk bisa menangani banyak operator bot sekaligus dengan konfigurasi yang unik untuk masing-masing wallet.
 
-### ⚠️ Hirarki Konfigurasi (Priority)
-Bot ini dirancang untuk **selalu patuh** pada aturan yang ada di Smart Contract:
+### Hirarki Konfigurasi (Priority)
+Bot ini dirancang untuk selalu patuh pada aturan yang ada di Smart Contract:
 - **On-Chain Priority**: Jika wallet bot sudah dikonfigurasi melalui fungsi `configureBotConfig` di `AutoBetManager.sol`, maka bot akan **mengabaikan** nilai default di file script dan menggunakan nilai dari blockchain.
 - **Local Fallback**: Bot hanya akan menggunakan nilai di file `autoBet.js` jika wallet tersebut belum terdaftar sama sekali di Smart Contract.
 
 Gunakan Smart Contract untuk merubah strategi (min/max bet, frekuensi) secara real-time tanpa menyentuh server VPS.
-
+![](assets/bot-3)
 ---
 
 ## Mekanisme Staggered Betting (Anti-Spike)
