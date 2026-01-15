@@ -5,7 +5,7 @@
 Bot ini adalah script off-chain berbasis Node.js yang berfungsi sebagai Liquidity Provider otomatis. Bot ini sangat krusial untuk memastikan ekosistem TarikTambang tetap hidup dengan melakukan transaksi taruhan secara otomatis berdasarkan aturan yang ditetapkan di Blockchain.
 
 ---
-
+![](assets/bot-1)
 ## Mengapa Menggunakan Bot Ini?
 
 Dalam sistem permainan berbasis waktu (Hourly Sessions) seperti TarikTambang Onchain, ada risiko terjadinya "Empty Sessions". Berikut adalah alasan utama mengapa bot ini diimplementasikan:
@@ -20,7 +20,7 @@ Dalam sistem permainan berbasis waktu (Hourly Sessions) seperti TarikTambang Onc
 
 - **Manager Contract Address**: <a href="https://sepolia.basescan.org/address/0x07b8e3c89bd7d27b6df5dc06919282e786c2e466" target="_blank">0x07b8e3c89bd7d27b6df5dc06919282e786c2e466</a>
 - **Fungsi Utama**: Menyimpan konfigurasi strategi bot secara on-chain agar transparan dan dapat dikendalikan jarak jauh.
-
+![](assets/bot-2)
 ---
 
 ## Alur Kerja AutoBetManager.sol
