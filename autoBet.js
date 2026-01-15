@@ -4,7 +4,7 @@ const cron = require('node-cron');
 
 // Configuration
 const RPC_URL = process.env.RPC_URL || 'https://mainnet.base.org';
-const BOT_PRIVATE_KEY = process.env.BOT_PRIVATE_KEY;
+const BOT_PRIVATE_KEYS = process.env.BOT_PRIVATE_KEY.split(',').map(key => key.trim()); // Support comma-separated keys
 const GAME_CONTRACT_ADDRESS = process.env.GAME_CONTRACT_ADDRESS;
 const MANAGER_CONTRACT_ADDRESS = process.env.MANAGER_CONTRACT_ADDRESS;
 
@@ -24,7 +24,7 @@ const MANAGER_ABI = [
 ];
 
 // Validate environment variables
-if (!BOT_PRIVATE_KEY) {
+if (!BOT_PRIVATE_KEYS[0]) {
     console.error('❌ BOT_PRIVATE_KEY not set in .env file');
     process.exit(1);
 }
@@ -34,36 +34,26 @@ if (!GAME_CONTRACT_ADDRESS) {
     process.exit(1);
 }
 
-// Setup provider and wallet
+// Setup provider
 const provider = new ethers.JsonRpcProvider(RPC_URL);
-const wallet = new ethers.Wallet(BOT_PRIVATE_KEY, provider);
-const gameContract = new ethers.Contract(GAME_CONTRACT_ADDRESS, GAME_ABI, wallet);
-const managerContract = MANAGER_CONTRACT_ADDRESS ? new ethers.Contract(MANAGER_CONTRACT_ADDRESS, MANAGER_ABI, wallet) : null;
+
+console.log('🤖 TarikTambang Multi-Wallet Bot Started');
+console.log(`👥 Managed Wallets: ${BOT_PRIVATE_KEYS.length}`);
+console.log('📍 Game Contract:', GAME_CONTRACT_ADDRESS);
+console.log('---');
 
 let lastRunTime = 0;
 let isExecuting = false;
 
-console.log('🤖 TarikTambang Auto-Bet Bot (Enhanced) Started');
-console.log('📍 Game Contract:', GAME_CONTRACT_ADDRESS);
-if (MANAGER_CONTRACT_ADDRESS) {
-    console.log('⚙️  Manager Contract:', MANAGER_CONTRACT_ADDRESS);
-} else {
-    console.log('⚠️  Manager Contract not set, using default local settings');
-}
-console.log('🔑 Bot Wallet:', wallet.address);
-console.log('---');
-
-let lastRunTime = 0;
-
 /**
  * Get bot configuration (On-chain if manager exists, otherwise local defaults)
  */
-async function getBotConfig() {
-    if (managerContract) {
+async function getBotConfig(walletAddress) {
+    if (MANAGER_CONTRACT_ADDRESS) {
         try {
-            const config = await managerContract.getBotConfig(wallet.address);
-            // If bit 0, it means not yet configured on-chain
-            if (config.minBetAmount === 0n) throw new Error("Not configured on-chain");
+            const managerContract = new ethers.Contract(MANAGER_CONTRACT_ADDRESS, MANAGER_ABI, provider);
+            const config = await managerContract.getBotConfig(walletAddress);
+            if (config.minBetAmount === 0n) throw new Error("Not configured");
 
             return {
                 minBet: config.minBetAmount,
@@ -73,7 +63,7 @@ async function getBotConfig() {
                 teamAWeight: Number(config.teamAWeight),
             };
         } catch (error) {
-            console.log('ℹ️  Using default settings (not configured on-chain or error)');
+            // Silence manager errors
         }
     }
 
@@ -88,41 +78,37 @@ async function getBotConfig() {
 }
 
 /**
- * Place a bet
+ * Place a bet for a specific wallet
  */
-async function placeBet() {
+async function placeBetForWallet(privateKey) {
     try {
-        const config = await getBotConfig();
+        const wallet = new ethers.Wallet(privateKey, provider);
+        const gameContract = new ethers.Contract(GAME_CONTRACT_ADDRESS, GAME_ABI, wallet);
+        const config = await getBotConfig(wallet.address);
 
-        if (!config.isActive) {
-            console.log('⏸️  Bot is inactive (config.isActive = false)');
-            return;
-        }
+        if (!config.isActive) return;
 
         // Check if betting is open
         const isOpen = await gameContract.isBettingOpen();
         if (!isOpen) {
-            console.log('⏸️  Betting not open, skipping...');
+            console.log(`⏸️ [${wallet.address.substring(0, 6)}] Betting closed.`);
             return;
         }
 
         const sessionId = await gameContract.currentSessionId();
 
-        // Check if bot already committed to a team in this session
+        // Check if wallet already committed to a team
         const [currentTeamInt] = await gameContract.getUserBet(sessionId, wallet.address);
         let team;
 
-        if (currentTeamInt === 1) { // 1 = TeamA
+        if (currentTeamInt === 1) {
             team = 'TeamA';
-            console.log(`ℹ️ Bot already bet on TeamA this session. Continuing...`);
-        } else if (currentTeamInt === 2) { // 2 = TeamB
+        } else if (currentTeamInt === 2) {
             team = 'TeamB';
-            console.log(`ℹ️ Bot already bet on TeamB this session. Continuing...`);
         } else {
-            // First bet of the session: pick random team based on weight
+            // First bet: pick random team
             const randomVal = Math.random() * 100;
             team = randomVal < config.teamAWeight ? 'TeamA' : 'TeamB';
-            console.log(`🎲 First bet of session: Picking ${team} (Weight: ${config.teamAWeight}%)`);
         }
 
         // Random amount between min and max
@@ -131,9 +117,7 @@ async function placeBet() {
         const randomAmount = minEth + Math.random() * (maxEth - minEth);
         const betAmount = ethers.parseEther(randomAmount.toFixed(6));
 
-        console.log(`🎲 Betting on ${team} (Weight: ${config.teamAWeight}%)`);
-        console.log(`💰 Amount: ${randomAmount.toFixed(6)} ETH`);
-        console.log(`📊 Session: ${sessionId}`);
+        console.log(`🎲 [${wallet.address.substring(0, 6)}] Betting on ${team} (${randomAmount.toFixed(6)} ETH)`);
 
         let tx;
         if (team === 'TeamA') {
@@ -141,53 +125,38 @@ async function placeBet() {
         } else {
             tx = await gameContract.betOnTeamB({ value: betAmount });
         }
-
-        console.log(`📤 Tx Sent: ${tx.hash}`);
-        const receipt = await tx.wait();
-        console.log(`✅ Confirmed in block ${receipt.blockNumber}`);
-        console.log('---');
+        await tx.wait();
+        console.log(`✅ Transaction Done: ${tx.hash}`);
 
     } catch (error) {
-        console.error('❌ Error placing bet:', error.message);
-        console.log('---');
+        console.error(`❌ Error for wallet:`, error.message);
     }
 }
 
 /**
- * Check balance
- */
-async function checkBalance() {
-    try {
-        const balance = await provider.getBalance(wallet.address);
-        console.log(`💼 Bot Balance: ${ethers.formatEther(balance)} ETH`);
-        console.log('---');
-    } catch (error) {
-        console.log('⚠️  Could not check balance');
-    }
-}
-
-/**
- * Main loop logic
+ * Main cycle for all wallets
  */
 async function runBot() {
-    if (isExecuting) {
-        console.log('⏳ Bot is already executing a transaction, skipping this cycle...');
-        return;
-    }
+    if (isExecuting) return;
 
     const now = Date.now();
-    const config = await getBotConfig();
+    // Use first wallet's frequency as master frequency (or you can customize)
+    const config = await getBotConfig(new ethers.Wallet(BOT_PRIVATE_KEYS[0], provider).address);
 
-    // Check if enough time has passed based on frequency
     if (now - lastRunTime >= config.frequency * 1000) {
         isExecuting = true;
+        console.log(`⏰ [${new Date().toLocaleString()}] Starting Multi-Wallet Cycle...`);
+
         try {
-            console.log(`⏰ [${new Date().toLocaleString()}] Cycle Start`);
-            await checkBalance();
-            await placeBet();
+            for (const key of BOT_PRIVATE_KEYS) {
+                await placeBetForWallet(key);
+                // Slight delay between wallets to avoid nonce issues if using same wallet (not the case here but good practice)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
             lastRunTime = now;
         } finally {
             isExecuting = false;
+            console.log('--- Cycle Finished ---');
         }
     }
 }
@@ -195,10 +164,9 @@ async function runBot() {
 // Initial run
 runBot();
 
-// Check every minute if it should run
+// Check every minute
 cron.schedule('* * * * *', runBot);
 
-// Graceful shutdown
 process.on('SIGINT', () => {
     console.log('\n👋 Shutting down...');
     process.exit(0);
