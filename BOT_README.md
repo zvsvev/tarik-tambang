@@ -1,184 +1,71 @@
-# TarikTambang Auto-Bet Bot
+# TarikTambang Auto-Bet Bot 🤖
 
-**TarikTambang - Pull Together, Win Together**
+**"Automated On-chain Strategy Manager"**
 
-Automated betting bot to prevent empty sessions in TarikTambang Onchain.
+Bot ini adalah script off-chain berbasis Node.js yang bertugas menjaga aktivitas permainan agar tetap hidup dengan melakukan taruhan secara otomatis mengacu pada aturan yang ditetapkan di Blockchain.
 
-## Features
+---
 
-- 🎲 Random team selection (50/50 Team A vs Team B)
-- 💰 Random bet amounts (0.0001 - 0.001 ETH)
-- ⏰ Runs every 10-15 minutes (randomized timing)
-- 🔄 Auto-retry on errors
-- 💼 Balance monitoring
+## 📍 AutoBetManager Details
 
-## Setup
+- **Manager Contract Address**: [`0x07b8e3c89bd7d27b6df5dc06919282e786c2e466`](https://sepolia.basescan.org/address/0x07b8e3c89bd7d27b6df5dc06919282e786c2e466)
+- **Fungsi Utama**: Menyimpan konfigurasi strategi bot secara on-chain agar transparan dan dapat dikendalikan jarak jauh.
 
-### 1. Install Dependencies
+---
 
+## 🚀 Alur Kerja AutoBetManager.sol
+
+Contract Manager bertindak sebagai "Pusat Kendali" bagi bot. Alur kerjanya adalah sebagai berikut:
+
+1.  **Konfigurasi On-Chain**: Pemilik bot memasukkan parameter strategi ke dalam dApps/Explorer melalui fungsi `configureBotConfig`. Parameter meliputi:
+    - `min/maxBet`: Batas nominal taruhan.
+    - `frequency`: Jeda waktu antar taruhan (dalam detik).
+    - `teamAWeight`: Preferensi tim (misal 70% arah Team A).
+2.  **Health Check**: Bot di VPS akan melakukan request ke Manager setiap kali akan beraksi untuk mengecek fungsi `isBotActive`. Jika admin mematikan bot via blockchain, bot di VPS akan otomatis berhenti (pause).
+3.  **Dynamic Updates**: Jika admin merubah frekuensi taruhan di Blockchain, bot akan langsung menyesuaikan perilakunya tanpa perlu restart script di server.
+4.  **Multi-Bot Support**: Contract dirancang untuk bisa menangani banyak operator bot sekaligus dengan konfigurasi yang unik untuk masing-masing wallet.
+
+---
+
+## 🛠 Panduan Setup Bot di VPS
+
+### 1. Prasyarat
+- Node.js v18+
+- Akun Base Sepolia dengan saldo ETH.
+
+### 2. Instalasi
 ```bash
-cd src/v2
+git clone https://github.com/zvsvev/tarik-tambang.git
+cd tarik-tambang
+cp bot-package.json package.json
 npm install
+sudo npm install -g pm2
 ```
 
-### 2. Configure Environment
-
-Copy `.env.example` to `.env`:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and fill in:
-
+### 3. Konfigurasi (`.env`)
+Buat file `.env` dan isi dengan alamat contract yang sudah dideploy:
 ```env
-RPC_URL=https://sepolia.base.org
-BOT_PRIVATE_KEY=your_bot_wallet_private_key
-CONTRACT_ADDRESS=0x...deployed_contract_address
+RPC_URL=https://base-sepolia.drpc.org
+BOT_PRIVATE_KEY=your_private_key
+GAME_CONTRACT_ADDRESS=0xc1bbd48cbb7c56da60c0077a1e9d081794ab3edd
+MANAGER_CONTRACT_ADDRESS=0x07b8e3c89bd7d27b6df5dc06919282e786c2e466
 ```
 
-⚠️ **IMPORTANT:** 
-- Create a **NEW wallet** for the bot (don't use your main wallet)
-- Keep the private key **SECRET**
-- Fund the bot wallet with ETH for gas + betting
-
-### 3. Fund Bot Wallet
-
-The bot needs ETH for:
-- Gas fees (~$0.10 per bet on Base)
-- Bet amounts (0.0001 - 0.001 ETH per bet)
-
-**Recommended funding:**
-- Testnet: 0.1 ETH (enough for ~100 bets)
-- Mainnet: 0.5 ETH (enough for ~50 bets + gas)
-
-### 4. Run Bot
-
-**Development (with auto-restart):**
+### 4. Menjalankan Bot
+Gunakan PM2 agar bot berjalan 24/7 di background:
 ```bash
-npm run dev
-```
-
-**Production:**
-```bash
-npm start
-```
-
-**Background (using PM2):**
-```bash
-npm install -g pm2
-pm2 start autoBet.js --name tariktambang-bot
+pm2 start autoBet.js --name "tariktambang-bot"
 pm2 save
 pm2 startup
 ```
 
-## Monitoring
+---
 
-Check bot status:
-```bash
-pm2 status
-pm2 logs tariktambang-bot
-```
-
-Stop bot:
-```bash
-pm2 stop tariktambang-bot
-```
-
-## Configuration
-
-Edit `autoBet.js` to customize:
-
-- **Bet frequency:** Line 124 - `cron.schedule('*/10 * * * *', ...)`
-  - `*/10` = every 10 minutes
-  - Change to `*/5` for every 5 minutes
-  
-- **Bet amount range:** Lines 58-60
-  ```javascript
-  const minBet = 0.0001;
-  const maxBet = 0.001;
-  ```
-
-- **Random delay:** Line 126
-  ```javascript
-  const delayMinutes = Math.floor(Math.random() * 5); // 0-5 minutes
-  ```
-
-## Troubleshooting
-
-**Error: "BOT_PRIVATE_KEY not set"**
-- Make sure `.env` file exists in `src/v2/` folder
-- Check that `BOT_PRIVATE_KEY` is set correctly
-
-**Error: "insufficient funds"**
-- Bot wallet needs more ETH
-- Send ETH to bot wallet address
-
-**Error: "Betting not open"**
-- Normal - bot skips when betting window is closed
-- Wait for next session
-
-**Bot not running:**
-```bash
-# Check if process is running
-pm2 status
-
-# Restart bot
-pm2 restart tariktambang-bot
-
-# View logs
-pm2 logs tariktambang-bot --lines 100
-```
-
-## Security Notes
-
-🔒 **NEVER commit `.env` file to git!**
-
-The `.env` file is already in `.gitignore`, but double-check:
-```bash
-git status
-# Should NOT show .env file
-```
-
-🔑 **Generate a new wallet for the bot:**
-```javascript
-// In Node.js console:
-const ethers = require('ethers');
-const wallet = ethers.Wallet.createRandom();
-console.log('Address:', wallet.address);
-console.log('Private Key:', wallet.privateKey);
-```
-
-## Cost Estimation
-
-**Base Sepolia (Testnet):**
-- Gas: FREE (testnet ETH)
-- Bets: ~0.0005 ETH average × 6 bets/hour = 0.003 ETH/hour
-- Daily: ~0.072 ETH
-
-**Base Mainnet:**
-- Gas: ~$0.10 per bet
-- Bets: ~$1.25 average × 6 bets/hour = $7.50/hour
-- Daily: ~$180 (but bot can win back some!)
-
-## For UGM Blockchain Club Presentation
-
-When presenting, explain:
-
-1. **Why bot is needed:** Smart contracts can't auto-execute, need external trigger
-2. **How it works:** Node.js cron job that calls contract functions
-3. **Randomness:** Random team + amount to simulate real users
-4. **Cost-effective:** Simple solution vs expensive Chainlink Automation
-
-**Demo:**
-```bash
-# Show bot running
-npm start
-
-# Show logs in real-time
-# Bot will place bets every 10-15 minutes
-```
+## 📊 Monitoring
+Anda dapat memantau aktivitas bot secara real-time melalui:
+- **PM2 Logs**: `pm2 logs tariktambang-bot`
+- **Block Explorer**: Cek transaksi keluar pada wallet bot Anda di BaseScan.
 
 ---
 
-**TarikTambang - Pull Together, Win Together** 🎯
+**Note**: Bot ini dirancang untuk tujuan edukasi dan penjagaan likuiditas game dalam ekosistem TarikTambang Onchain.
