@@ -15,6 +15,7 @@ const GAME_ABI = [
     'function currentSessionId() external view returns (uint256)',
     'function isBettingOpen() external view returns (bool)',
     'function getUserBet(uint256 sessionId, address user) external view returns (uint8 team, uint256 amount)',
+    'function sessions(uint256) external view returns (uint256 sessionId, uint256 startTime, uint256 endTime, uint256 totalTeamA, uint256 totalTeamB, uint256 houseFunds, uint256 finalizerReward, uint8 winner, address finalizer, bool finalized)',
 ];
 
 // Manager Contract ABI (minimal)
@@ -88,17 +89,32 @@ async function placeBetForWallet(privateKey) {
 
         if (!config.isActive) return;
 
-        // Check if betting is open
+        // Check if betting is open OR if it's time to trigger a new session
         const isOpen = await gameContract.isBettingOpen();
-        if (!isOpen) {
+        const sessionId = await gameContract.currentSessionId();
+
+        let shouldTriggerNew = false;
+        if (sessionId > 0) {
+            const sessionData = await gameContract.sessions(sessionId);
+            const endTime = Number(sessionData.endTime);
+            if (Date.now() / 1000 >= endTime) {
+                shouldTriggerNew = true;
+                console.log(`⏰ [${wallet.address.substring(0, 6)}] Time to trigger new session!`);
+            }
+        }
+
+        if (!isOpen && !shouldTriggerNew) {
             console.log(`⏸️ [${wallet.address.substring(0, 6)}] Betting closed.`);
             return;
         }
 
-        const sessionId = await gameContract.currentSessionId();
-
         // Check if wallet already committed to a team
-        const [currentTeamInt] = await gameContract.getUserBet(sessionId, wallet.address);
+        // Only check if we are NOT triggering a new session
+        let currentTeamInt = 0;
+        if (!shouldTriggerNew) {
+            const result = await gameContract.getUserBet(sessionId, wallet.address);
+            currentTeamInt = Number(result[0]);
+        }
         let team;
 
         if (currentTeamInt === 1) {
