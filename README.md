@@ -47,5 +47,5 @@ Jika terjadi seri, sistem **tidak memungut fee apapun**.
 
 ---
 
-## 📄 Lisensi
+## Lisensi
 Distributed under the MIT License. See `LICENSE` for more information.
